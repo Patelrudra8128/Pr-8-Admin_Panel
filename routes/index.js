@@ -453,8 +453,6 @@ routes.post('/postProduct',passport.checkAuthentication,fileUpload,async(req,res
             subcategoryId : subcategory,
             product  :product,
             price : price,
-            qty : qty,
-            description : description,
             image : req.file.path
         })
         if(productInsert){
@@ -469,7 +467,5 @@ routes.post('/postProduct',passport.checkAuthentication,fileUpload,async(req,res
         return false;
     }
 })
-
-
 
 module.exports = routes; 
