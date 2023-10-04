@@ -307,13 +307,14 @@ routes.get('/deleteCategory/:id', passport.checkAuthentication, async (req, res)
         let deletecategory = await categoryTbl.findByIdAndRemove({ _id: id });
         
         if (!deletecategory) {
-            // Handle the case where the category is not found
-            return res.status(404).json({ message: 'Category not found' });
+            req.flash('error',"Category not found");
+            return res.redirect('back');
         }
 
-        // Find and delete subcategories
         await subcategoryTbl.deleteMany({ categoryId: id });
+        await productTbl.deleteMany({ categoryId: id });
 
+        req.flash('error',"Sub-Category successfully deleted");
         return res.redirect('back');
     } catch (err) {
         console.log(err);
@@ -406,14 +407,17 @@ routes.post('/postEditSubCategory',passport.checkAuthentication,async(req,res)=>
 routes.get('/deletesubcategory',passport.checkAuthentication,async(req,res)=>{
     try{
         let editid = req.query.id;
-        let deletecategory = await subcategoryTbl.findByIdAndDelete(editid);
-        if(deletecategory){
-            req.flash('success',"Category successfully delete");
-            return res.redirect('back');
-        }else{
-            req.flash('error',"Category not successfully delete");
+        let deletesubcategory = await subcategoryTbl.findByIdAndRemove({_id : editid});
+        if(!deletesubcategory){
+            req.flash('error',"Sub-category not found");
             return res.redirect('back');
         }
+        
+        await productTbl.deleteMany({ subcategoryId : editid});
+
+        req.flash('error',"Sub-Category successfully deleted");
+        return res.redirect('back');
+
     }catch(err){
         console.log(err);
         return false;
@@ -423,7 +427,6 @@ routes.get('/deletesubcategory',passport.checkAuthentication,async(req,res)=>{
 routes.get('/product',passport.checkAuthentication,async(req,res)=>{
     try{
         let product = await productTbl.find({}).populate('subcategoryId').populate('categoryId');
-        console.log(product);
         return res.render('product/product',{
             product
         })
@@ -465,6 +468,23 @@ routes.post('/postProduct',passport.checkAuthentication,fileUpload,async(req,res
             req.flash('error',"Product not successfully insert");
             return res.redirect('back');
         }
+    }catch(err){
+        console.log(err);
+        return false;
+    }
+});
+
+routes.get('/deleteproduct',passport.checkAuthentication,async(req,res)=>{
+    try{
+        let delid = req.query.id;
+        let deleteproduct = await productTbl.findByIdAndDelete({delid});
+        if(!deleteproduct){
+            req.flash('error',"Product not found");
+            return res.redirect('back');
+        }
+        req.flash('error',"Product successfully deleted");
+        return res.redirect('back');
+
     }catch(err){
         console.log(err);
         return false;
