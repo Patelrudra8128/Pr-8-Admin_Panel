@@ -174,7 +174,7 @@ routes.post('/emailData',async(req,res)=>{
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                  user: 'rwn3developer11@gmail.com',
+                  user: 'patelrudra8128@gmail.com',
                   pass: 'errfowpkwdibiofo'
                 }
               });
@@ -182,9 +182,9 @@ routes.post('/emailData',async(req,res)=>{
               let otp = Math.floor(Math.random() * 100000);
 
               var mailOptions = {
-                from: 'rwn3developer11@gmail.com',
+                from: 'patelrudra8128@gmail.com',
                 to: req.body.emaildata,
-                subject: 'Sending Email using Node.js',
+                subject: 'Otp to change Password',
                 text: 'Your otp :- '+otp
               };
 
