@@ -1704,3 +1704,26 @@
     }
     
 </script>
+
+
+<!-- Category Delete -->
+routes.get('/deleteCategory/:id', passport.checkAuthentication, async (req, res) => {
+    try {
+        let id = req.params.id;
+        let deletecategory = await categoryTbl.findOneAndDelete({ _id: id });
+        
+        if (!deletecategory) {
+            // Handle the case where the category is not found
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Find and delete subcategories
+        await subcategoryTbl.deleteMany({ categoryId: id });
+
+        // Respond with a success message
+        return res.redirect('back');
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});

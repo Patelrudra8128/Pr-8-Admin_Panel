@@ -301,22 +301,25 @@ routes.post('/postCategory',passport.checkAuthentication,async(req,res)=>{
     }
 })
 
-routes.get('/deleteCategory/:id',passport.checkAuthentication,async(req,res)=>{
-    try{
+routes.get('/deleteCategory/:id', passport.checkAuthentication, async (req, res) => {
+    try {
         let id = req.params.id;
-        let deletecategory = await categoryTbl.findByIdAndDelete(id);
-        if(deletecategory){
-            req.flash('success',"Category successfully delete");
-            return res.redirect('back');
-        }else{
-            req.flash('error',"Category not successfully delete");
-            return res.redirect('back');
+        let deletecategory = await categoryTbl.findByIdAndRemove({ _id: id });
+        
+        if (!deletecategory) {
+            // Handle the case where the category is not found
+            return res.status(404).json({ message: 'Category not found' });
         }
-    }catch(err){
+
+        // Find and delete subcategories
+        await subcategoryTbl.deleteMany({ categoryId: id });
+
+        return res.redirect('back');
+    } catch (err) {
         console.log(err);
-        return false;
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
-})
+});
 
 routes.get('/subcategory',passport.checkAuthentication,async(req,res)=>{
     try{
